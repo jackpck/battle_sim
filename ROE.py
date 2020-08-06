@@ -37,6 +37,5 @@ class range_ROE(ROE):
         self.__range = r
 
     def aim(self, enemyRegiment):
-        enemy_soldier_list = list(enemyRegiment.soldier_list)
-        for soldier_id in self.__thisRegiment.soldier_list:
+        pass
 
