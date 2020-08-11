@@ -14,13 +14,14 @@ class DeltaDeploy(Deploy):
     this will create an artifact that odd integer health will favor one team
     while even integer health will favor another.
     '''
-    def __init__(self, thisRegiment_):
-        self.__thisRegiment = thisRegiment_
+    def __init__(self, thisBrigade_):
+        self.__thisBrigade = thisBrigade_
 
-    def deploy(self, attack, health):
-        self.__thisRegiment.frontline = {i: self.__thisRegiment.Soldier(attack, health)
-                                         for i in range(self.__thisRegiment.get_Nsoldier())}
-        self.__thisRegiment.soldier_list = set(self.__thisRegiment.frontline.keys())
+    def deploy(self, attack, health, reserve=False):
+        if reserve:
+            self.__thisRegiment.frontline = {i: self.__thisRegiment.Soldier(attack, health)
+                                             for i in range(self.__thisRegiment.get_Nsoldier())}
+            self.__thisRegiment.soldier_list = set(self.__thisRegiment.frontline.keys())
 
 
 class UniformDeploy(Deploy):
@@ -36,6 +37,7 @@ class UniformDeploy(Deploy):
                                                                         health + random.uniform(-spread,spread))
                                          for i in range(self.__thisRegiment.get_Nsoldier())}
         self.__thisRegiment.soldier_list = set(self.__thisRegiment.frontline.keys())
+
 
 
 if __name__ == '__main__':
