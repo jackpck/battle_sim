@@ -3,8 +3,6 @@ Rule of engagement
 '''
 
 import numpy as np
-from Regiment import Regiment
-from math import floor, ceil
 
 class ROE:
     def __init__(self):

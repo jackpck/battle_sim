@@ -31,13 +31,6 @@ class Regiment:
     def get_Nsoldier(self):
         return self.__Nsoldier
 
-    def deploy(self, attack, health):
-        '''
-        setup the frontline and setip the attack and health of each soldier
-        '''
-        self.frontline = {i:self.Soldier(attack, health) for i in range(self.__Nsoldier)}
-        self.soldier_list = set(self.frontline.keys())
-
     def fire(self, enemyRegiment):
         for soldier_id in self.soldier_list:
             enemy_id = self.frontline[soldier_id].get_target()
