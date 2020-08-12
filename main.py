@@ -51,8 +51,6 @@ if __name__ == '__main__':
     plt.show()
 
 
-
-
 #FILE = open('./data/attack_ratio_%.3f_n_ratio_%.3f.txt'%(attack_ratio, n_ratio),'w')
 #FILE.write(str(who_win) + '\n')
 #FILE.close()

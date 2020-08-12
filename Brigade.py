@@ -1,8 +1,7 @@
 from math import floor, ceil
 
 class Brigade:
-    def __init__(self, Nregiment, Nsoldier):
-        self.__Nregiment = Nregiment
+    def __init__(self, Nsoldier):
         self.__Nsoldier = Nsoldier # initial number of soldier. Constant
         self.brigade = [] # list of regiments (list of list of soldiers)
         self.regiment_list = [] # list of soldier_list set
@@ -10,7 +9,7 @@ class Brigade:
     class Regiment:
         def __init__(self):
             self.soldier_list = set() # id of surviving soldier
-            self.regiment = [] # list of soldiers (alive or dead)
+            self.regiment = {} # dict of soldiers (alive or dead)
 
         class Soldier:
             __slot__ = '__attack', '__health', '__target'

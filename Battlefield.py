@@ -6,6 +6,7 @@ class Battlefield:
         self.__team2_roe = team2_roe
 
 
+
     def commence_round(self):
         self.__team1_roe.aim(self.__team2)
         self.__team2_roe.aim(self.__team1)
@@ -17,13 +18,11 @@ class Battlefield:
         self.__team2.count_KIA()
 
     def commence(self):
-        while self.__team1.soldier_list and self.__team2.soldier_list:
+        while self.__team1.brigade[0].soldier_list and self.__team2.brigade[0].soldier_list\
+                and self.__team1.brigade[1].soldier_list and self.__team2.brigade[1].soldier_list:
             self.commence_round()
-
-    def commence_with_reinforcement(self, reserveRegiment):
-        while self.__team1.soldier_list and self.__team2.soldier_list:
-            self.commence_round()
-            self.__team1.reinforcement(reserveRegiment)
+            self.__team1.reinforcement()
+            self.__team2.reinforcement()
 
 
     def who_win(self):
