@@ -20,8 +20,8 @@ class fully_connected_ROE(ROE):
         self.__thisBrigade = thisBrigade_
 
     def aim(self, enemyBrigade):
-        enemy_soldier_list = list(enemyBrigade.regiment_list[0].soldier_list)
-        for soldier_id in self.__thisBrigade.regiment_list[0].soldier_list:
+        enemy_soldier_list = list(enemyBrigade.regiment_list[0])
+        for soldier_id in self.__thisBrigade.regiment_list[0]:
             enemy_targeted = np.random.choice(enemy_soldier_list)
             self.__thisBrigade.brigade[0][soldier_id].set_target(enemy_targeted)
 

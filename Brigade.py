@@ -37,20 +37,20 @@ class Brigade:
         return self.__Nsoldier
 
     def fire(self, enemyBrigade):
-        for soldier_id in self.regiment_list[0].soldier_list:
+        for soldier_id in self.regiment_list[0]:
             enemy_id = self.brigade[0][soldier_id].get_target()
             damage = self.brigade[0][soldier_id].get_attack()
             if enemy_id is not None: # an enemy is targeted (i.e. not None)
-                enemyBrigade[0][enemy_id].receive_damage(damage)
+                enemyBrigade.brigade[0][enemy_id].receive_damage(damage)
 
     def count_KIA(self):
         '''
         If soldier's health <= 0, remove id from the soldier_list
         '''
-        temp_soldier_list = self.regiment_list[0].soldier_list.copy()
+        temp_soldier_list = self.regiment_list[0].copy()
         for soldier_id in temp_soldier_list:
             if self.brigade[0][soldier_id].get_health() <= 0:
-                self.regiment_list[0].soldier_list.remove(soldier_id)
+                self.regiment_list[0].remove(soldier_id)
 
     def reinforcement(self):
         '''
@@ -60,9 +60,9 @@ class Brigade:
         if len(self.brigade) != 2:
             raise AssertionError('To call reinforcement, a brigade must have two regiments.')
 
-        while len(self.brigade[0].soldier_list) < self.get_regiment_size() and len(self.brigade[1].soldier_list) > 0:
-            reserve_id = self.brigade[1].soldier_list.pop()
-            replacement_id = 2*self.get_regiment_size() - len(self.brigade[1].soldier_list)
-            self.brigade[0].soldier_list.add(replacement_id) # reservist id starts from Nsoldier + 1
+        while len(self.regiment_list[0]) < len(self.brigade[0]) and len(self.regiment_list[1]) > 0:
+            reserve_id = self.regiment_list[1].pop()
+            replacement_id = len(self.brigade[0]) + len(self.brigade[1]) - len(self.regiment_list[1])
+            self.regiment_list[0].add(replacement_id) # reservist id starts from Nsoldier + 1
             self.brigade[0][replacement_id] = self.brigade[1][reserve_id]
 
