@@ -1,68 +1,70 @@
 from math import floor, ceil
 
-class Brigade:
-    def __init__(self, Nsoldier):
-        self.__Nsoldier = Nsoldier # initial number of soldier. Constant
-        self.brigade = [] # list of regiments (list of list of soldiers)
-        self.regiment_list = [] # list of soldier_list set
+class Regiment:
+    def __init__(self):
+        self.battalion_set = set() # id of surviving soldier
+        self.offense_set = set()
+        self.battalions = [] # list of soldiers (alive or dead)
+        self.__target = None
 
-    class Regiment:
-        def __init__(self):
-            self.soldier_list = set() # id of surviving soldier
-            self.regiment = {} # dict of soldiers (alive or dead)
+    def get_full_size(self):
+        return len(self.battalions)
 
-        class Soldier:
-            __slot__ = '__attack', '__health', '__target'
-            def __init__(self, attack, health):
-                self.__attack = attack
-                self.__health = health
-                self.__target = None # enemy_id he targets
-
-            def set_target(self, enemy_id):
-                self.__target = enemy_id
-
-            def get_target(self):
-                return self.__target
-
-            def receive_damage(self, damage):
-                self.__health -= damage
-
-            def get_health(self):
-                return self.__health
-
-            def get_attack(self):
-                return self.__attack
-
-    def get_regiment_size(self):
-        return self.__Nsoldier
-
-    def fire(self, enemyBrigade):
-        for soldier_id in self.regiment_list[0]:
-            enemy_id = self.brigade[0][soldier_id].get_target()
-            damage = self.brigade[0][soldier_id].get_attack()
-            if enemy_id is not None: # an enemy is targeted (i.e. not None)
-                enemyBrigade.brigade[0][enemy_id].receive_damage(damage)
+    def fire(self, enemyRegiment):
+        for bat_id in self.offense_set:
+            enemy_bat_id = self.battalions[bat_id].get_target()
+            damage = self.battalions[bat_id].get_attack()
+            if enemy_bat_id is not None: # an enemy is targeted (i.e. not None)
+                enemyRegiment.battalions[enemy_bat_id].receive_damage(damage)
 
     def count_KIA(self):
         '''
         If soldier's health <= 0, remove id from the soldier_list
         '''
-        temp_soldier_list = self.regiment_list[0].copy()
-        for soldier_id in temp_soldier_list:
-            if self.brigade[0][soldier_id].get_health() <= 0:
-                self.regiment_list[0].remove(soldier_id)
+        temp_battalion_set = self.battalion_set.copy()
+        for bat_id in temp_battalion_set:
+            if self.battalions[bat_id].get_health() <= 0:
+                self.battalion_set.remove(bat_id)
 
-    def reinforcement(self):
-        '''
-        continuous reinforcement: as soon as a soldier on the frontline is KIA, a reserve will replace him.
-        alternative: queue reinforcement: each reservist can only reinforce one specific frontline soldier.
-        '''
-        if len(self.brigade) != 2:
-            raise AssertionError('To call reinforcement, a brigade must have two regiments.')
 
-        while len(self.regiment_list[0]) < len(self.brigade[0]) and len(self.regiment_list[1]) > 0:
-            reserve_id = self.regiment_list[1].pop()
-            replacement_id = len(self.brigade[0]) + len(self.brigade[1]) - len(self.regiment_list[1])
-            self.regiment_list[0].add(replacement_id) # reservist id starts from Nsoldier + 1
-            self.brigade[0][replacement_id] = self.brigade[1][reserve_id]
+class Battalion:
+    __slot__ = '__attack', '__health', '__target'
+    def __init__(self, attack, health):
+        self.__attack = attack
+        self.__health = health
+        self.__target = None # enemy_id he targets
+
+    def set_target(self, enemy_battalion_id):
+        self.__target = enemy_battalion_id
+
+    def get_target(self):
+        return self.__target
+
+    def receive_damage(self, damage):
+        self.__health -= damage
+
+    def get_health(self):
+        return self.__health
+
+    def get_attack(self):
+        return self.__attack
+
+
+
+
+def reinforcement(self):
+    # TODO
+    pass
+    '''
+    continuous reinforcement: as soon as a soldier on the frontline is KIA, a reserve will replace him.
+    alternative: queue reinforcement: each reservist can only reinforce one specific frontline soldier.
+    if len(self.brigade) != 2:
+        raise AssertionError('To call reinforcement, a brigade must have two regiments.')
+
+    while len(self.regiment_list[0]) < len(self.brigade[0]) and len(self.regiment_list[1]) > 0:
+        reserve_id = self.regiment_list[1].pop()
+        replacement_id = len(self.brigade[0]) + len(self.brigade[1]) - len(self.regiment_list[1])
+        self.regiment_list[0].add(replacement_id) # reservist id starts from Nsoldier + 1
+        self.brigade[0][replacement_id] = self.brigade[1][reserve_id]
+    '''
 

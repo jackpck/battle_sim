@@ -8,7 +8,7 @@ class ROE:
     def __init__(self):
         pass
 
-    def aim(self, enemyBrigade_):
+    def aim(self, thisRegiment_, enemyBrigade_):
         pass
 
 class fully_connected_ROE(ROE):
@@ -16,24 +16,20 @@ class fully_connected_ROE(ROE):
     fully connected ROE
     '''
 
-    def __init__(self, thisBrigade_):
-        self.__thisBrigade = thisBrigade_
-
-    def aim(self, enemyBrigade):
-        enemy_soldier_list = list(enemyBrigade.regiment_list[0])
-        for soldier_id in self.__thisBrigade.regiment_list[0]:
-            enemy_targeted = np.random.choice(enemy_soldier_list)
-            self.__thisBrigade.brigade[0][soldier_id].set_target(enemy_targeted)
+    def aim(self, thisRegiment, enemyRegiment):
+        enemy_soldier_set = list(enemyRegiment.soldier_set)
+        for soldier_id in thisRegiment.soldier_set:
+            enemy_targeted = np.random.choice(enemy_soldier_set)
+            thisRegiment.regiment[soldier_id].set_target(enemy_targeted)
 
 class range_ROE(ROE):
     '''
     finite range ROE
     '''
 
-    def __init__(self, thisBrigade, r):
-        self.__thisBrigade = thisBrigade
+    def __init__(self, r):
         self.__range = r
 
-    def aim(self, enemyRegiment):
+    def aim(self, thisRegiment, enemyRegiment):
         pass
 
