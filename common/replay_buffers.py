@@ -32,6 +32,9 @@ class BasicBuffer:
         return (state_batch, action_batch, reward_batch, next_state_batch, done_batch)
 
     def sample_sequence(self, batch_size):
+        '''
+        Sample consecutive samples
+        '''
         state_batch = []
         action_batch = []
         reward_batch = []
