@@ -29,11 +29,22 @@ class UniformDeploy(Deploy):
     def __init__(self, thisRegiment, nBattalion):
         super().__init__(thisRegiment, nBattalion)
 
-    def deploy(self, attack, health, spread):
+    def deploy(self, attack, health, attack_spread, health_spread):
         for i in range(self.nBattalion):
             self.thisRegiment.battalion_set.add(i)
-            self.thisRegiment.battalions.append(Battalion(attack + random.uniform(-spread,spread),
-                                                          health + random.uniform(-spread,spread)))
+            self.thisRegiment.battalions.append(Battalion(attack + random.uniform(-attack_spread,attack_spread),
+                                                          health + random.uniform(-health_spread,health_spread)))
+
+
+class UniformIntDeploy(Deploy):
+    def __init__(self, thisRegiment, nBattalion):
+        super().__init__(thisRegiment, nBattalion)
+
+    def deploy(self, attack, health, attack_spread, health_spread):
+        for i in range(self.nBattalion):
+            self.thisRegiment.battalion_set.add(i)
+            self.thisRegiment.battalions.append(Battalion(attack + random.randint(-attack_spread,attack_spread),
+                                                          health + random.randint(-health_spread,health_spread)))
 
 
 if __name__ == '__main__':

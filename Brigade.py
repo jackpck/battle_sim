@@ -10,12 +10,14 @@ class Regiment:
     def get_full_size(self):
         return len(self.battalions)
 
+
     def fire(self, enemyRegiment):
         for bat_id in self.offense_set:
-            enemy_bat_id = self.battalions[bat_id].get_target()
-            damage = self.battalions[bat_id].get_attack()
-            if enemy_bat_id is not None: # an enemy is targeted (i.e. not None)
-                enemyRegiment.battalions[enemy_bat_id].receive_damage(damage)
+            if bat_id is not None and bat_id in self.battalion_set:
+                enemy_bat_id = self.battalions[bat_id].get_target()
+                damage = self.battalions[bat_id].get_attack()
+                if enemy_bat_id is not None: # an enemy is targeted (i.e. not None)
+                    enemyRegiment.battalions[enemy_bat_id].receive_damage(damage)
 
     def count_KIA(self):
         '''
@@ -48,6 +50,9 @@ class Battalion:
 
     def get_attack(self):
         return self.__attack
+
+    def set_health(self, health):
+        self.__health = health
 
 
 
