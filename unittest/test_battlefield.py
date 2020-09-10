@@ -1,9 +1,11 @@
 import sys
 sys.path.append('../')
+import numpy as np
 from Battlefield import Battlefield
 from Brigade import Regiment
 from Deploy import UniformIntDeploy
-from Commander import RandomCommander
+from Commander import RandomCommander, QCommander
+import torch
 
 import pytest
 
@@ -42,6 +44,23 @@ def initialize_randomcommanders():
     commander2.set_order_action_map()
     return commander1, commander2, battle
 
+
+@pytest.fixture
+def initialize_qcommander():
+    regiment1 = Regiment()
+    regiment2 = Regiment()
+    deploy1 = UniformIntDeploy(regiment1, nbattalion1)
+    deploy2 = UniformIntDeploy(regiment2, nbattalion2)
+    deploy1.deploy(attack1, health1, attackspread1, healthspread1)
+    deploy2.deploy(attack2, health2, attackspread2, healthspread2)
+    battle = Battlefield(regiment1, regiment2)
+
+    commander1 = QCommander(regiment1, regiment2, maxbattalion1)
+    commander2 = RandomCommander(regiment2, regiment1, maxbattalion2)
+    commander1.set_order_action_map()
+    commander2.set_order_action_map()
+    commander1.set_model()
+    return commander1, commander2, battle
 
 def test_initialization(initialize_regiments):
     regiment1, regiment2, battle = initialize_regiments
@@ -136,5 +155,41 @@ def test_two_attacks_on_same_defender(initialize_randomcommanders):
 
     assert battalion2_health3 - battalion1_attack4 == \
            battle.get_regiment2().battalions[3].get_health()
+
+
+def test_q_learning(initialize_qcommander):
+    '''
+    Check gather
+    Make sure MSE only contains Q(s,a) where a is chosen
+    '''
+    commander1, commander2, battle = initialize_qcommander
+    state = battle.state.copy()
+    order1, action1 = commander1.order(state, eps=0)
+    order2, action2 = commander2.order(state)
+    commander1.deliver_order(order1)
+    commander2.deliver_order(order2)
+
+    battle.commence_round()
+    battle.update_state()
+    next_state = battle.state.copy()
+    reward, done = battle.get_reward()
+    commander1.replay_buffer.push(state, action1, reward, next_state, done)
+
+    batch = commander1.replay_buffer.sample(1)
+
+    states, actions, rewards, next_states, dones = batch
+    states = torch.FloatTensor(states).to(commander1.device)
+    actions = torch.LongTensor(actions).to(commander1.device)
+    rewards = torch.FloatTensor(rewards).to(commander1.device)
+    next_states = torch.FloatTensor(next_states).to(commander1.device)
+    dones = np.array([int(done) for done in dones])
+    dones = torch.FloatTensor(dones).to(commander1.device)
+
+    commander1.model.eval() # use this if contain dropout (dropout causes forward passed output different every time)
+    curr_Q = commander1.model.forward(states).gather(1, actions.unsqueeze(1))
+    curr_Q_test = commander1.model.forward(states)[:,actions[0]]
+
+    assert curr_Q == curr_Q_test
+
 
 

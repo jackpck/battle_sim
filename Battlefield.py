@@ -38,14 +38,13 @@ class Battlefield:
         while self.__regiment1.battalion_set and self.__regiment2.battalion_set:
             self.commence_round()
 
-
     def get_reward(self):
         if not self.__regiment1.battalion_set or not self.__regiment2.battalion_set:
             result = len(self.__regiment1.battalion_set) - len(self.__regiment2.battalion_set)
             if result > 0:
-                return 10, True # regiment1 win, done
+                return 1, True # regiment1 win, done
             elif result < 0:
-                return -10, True # regiment2 win, done
+                return -1, True # regiment2 win, done
             else:
                 return 0, True # draw, done
         else:

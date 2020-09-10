@@ -55,6 +55,9 @@ class Commander:
                                 self.action_order_map[k] = (i,j,m,n)
                                 k += 1
 
+        else:
+            raise ValueError('Currently only support nbatcommand = 1 or 2.')
+
     def order(self, state):
         raise NotImplmentedError('must be implemented by subclass')
 
@@ -128,12 +131,7 @@ class QCommander(Commander):
         state = torch.FloatTensor(state).float().unsqueeze(0).to(self.device)
         #self.model.eval() # need this when forward passing one sample into nn with batchnorm layer
         qvals = self.model.forward(state)
-        print('**** q-table ****')
-        print(qvals.cpu().detach().numpy())
-        print('**** ******* ****')
         action = np.argmax(qvals.cpu().detach().numpy())
-        #if self.action_order_map[action][1] not in enemyRegiment.battalion_set:
-        #    print('suboptimal action')
 
         return self.action_order_map[action], action
 
@@ -146,40 +144,11 @@ class QCommander(Commander):
         dones = np.array([int(done) for done in dones])
         dones = torch.FloatTensor(dones).to(self.device)
 
-        print('states.shape: ', states.shape)
-        #curr_Q = self.model.forward(states)
-        #next_Q = self.model.forward(next_states)
-        #max_next_Q = torch.max(next_Q, 1)[0]
-        #best_action = torch.argmax(next_Q, 1)[0]
-        #expected_Q = curr_Q.clone()
-        #expected_Q[:, best_action] = rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q
-        '''
-        print('**** states ****')
-        print(states)
-        print('**** ****** ****')
-        print('**** next states ****')
-        print(next_states)
-        print('**** ****** ****')
-        print('**** q-next ****')
-        print(next_Q)
-        print('**** ********** ****')
-        print('**** done ****')
-        print(dones)
-        print('**** **** ****')
-        print('**** q-expected ****')
-        print(rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q)
-        print('**** ********** ****')
-        '''
         curr_Q = self.model.forward(states).gather(1, actions.unsqueeze(1)) # [batch_size, 1]
         curr_Q = curr_Q.squeeze(1)
         next_Q = self.model.forward(next_states) # [batch_size, naction]
         max_next_Q = torch.max(next_Q, 1)[0] # [batch_size, 1]
         expected_Q = rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q
-        #print('curr_Q: ',curr_Q.shape)
-        #print('next_Q: ',next_Q.shape)
-        #print('max_next_Q: ',max_next_Q.shape)
-        #print('rewards: ',rewards.shape)
-        #print('expected_Q: ',expected_Q.shape)
 
         loss = self.MSE_loss(curr_Q, expected_Q)
         return loss
@@ -192,12 +161,6 @@ class QCommander(Commander):
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-
-        #state = torch.FloatTensor(state).float().unsqueeze(0).to(self.device)
-        #qvals = self.model.forward(state)
-        #print('**** q-table (updated) ****')
-        #print(qvals.cpu().detach().numpy())
-        #print('**** ***************** ****')
 
         return loss.item()
 
