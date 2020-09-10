@@ -32,7 +32,7 @@ class BasicBuffer:
             next_state_batch.append(next_state)
             done_batch.append(done)
 
-        print('number of non zero rewards in this batch: ',n_nonzero_rewards)
+        #print('number of non zero rewards in this batch: ',n_nonzero_rewards)
         return (state_batch, action_batch, reward_batch, next_state_batch, done_batch)
 
     def sample_sequence(self, batch_size):
