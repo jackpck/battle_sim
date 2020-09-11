@@ -148,6 +148,10 @@ class QCommander(Commander):
         curr_Q = curr_Q.squeeze(1)
         next_Q = self.model.forward(next_states) # [batch_size, naction]
         max_next_Q = torch.max(next_Q, 1)[0] # [batch_size, 1]
+        print('rewards: ',rewards.squeeze(1))
+        print('max_next_Q: ',max_next_Q)
+        print('(1-dones): ',1-dones)
+        print('(1-dones)*max_next_Q: ',(1-dones)*max_next_Q)
         expected_Q = rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q
 
         loss = self.MSE_loss(curr_Q, expected_Q)
@@ -171,22 +175,15 @@ class doubleQCommander(QCommander):
                  replace_target_cnt=10):
         super().__init__(thisRegiment, enemyRegiment, nbatcommand,
                          gamma, buffer_size)
-        self.replay_buffer_dummy = BasicBuffer(max_size=buffer_size)
-        self.device_dummy = None
-        self.model_dummy = None
-        self.optimizer_dummy = None
-        self.MSE_loss_dummy = None
-
+        self.target_model = None
         self.replace_target_cnt = replace_target_cnt
         self.learn_step_counter = 0
 
     def set_model(self):
         super().set_model() # set the original model
-        self.device_dummy = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         input_dim = self.thisRegiment_size + self.enemyRegiment_size
         output_dim = len(self.order_action_map)
-        self.model_dummy = DQN(input_dim, output_dim).to(self.device_dummy)
-        self.optimizer_dummy = torch.optim.Adam(self.model_dummy.parameters())
+        self.target_model = DQN(input_dim, output_dim).to(self.device)
 
     def compute_loss(self, batch):
         states, actions, rewards, next_states, dones = batch
@@ -199,23 +196,28 @@ class doubleQCommander(QCommander):
 
         if self.replace_target_cnt is not None and \
                 self.learn_step_counter % self.replace_target_cnt == 0:
-            self.model_dummy.load_state_dict(self.model.state_dict())
+            self.target_model.load_state_dict(self.model.state_dict())
 
         curr_Q = self.model.forward(states).gather(1, actions.unsqueeze(1)).squeeze(1)
-        next_Q = self.model_dummy.forward(states).gather(1, actions.unsqueeze(1)).squeeze(1)
+        next_Q = self.target_model.forward(states)
         max_next_Q = torch.max(next_Q, 1)[0] # [batch_size, 1]
+        #print('rewards: ',rewards.squeeze(1))
+        #print('max_next_Q: ',max_next_Q)
+        #print('(1-dones): ',1-dones)
+        #print('(1-dones)*max_next_Q: ',(1-dones)*max_next_Q)
         expected_Q = rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q
 
         loss = self.MSE_loss(curr_Q, expected_Q)
         return loss
 
     def update(self, batch_size):
-        #batch =self.replay_buffer.sample_sequence(batch_size)
-        batch =self.replay_buffer.sample(batch_size)
+        batch =self.replay_buffer.sample_sequence(batch_size)
+        #batch =self.replay_buffer.sample(batch_size)
         loss = self.compute_loss(batch)
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+        self.learn_step_counter += 1
         return loss.item()
 
 

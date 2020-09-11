@@ -7,10 +7,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.autograd as autograd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from Battlefield import Battlefield
 from Brigade import Regiment
 from Deploy import UniformDeploy, UniformIntDeploy
+from Commander import doubleQCommander, RandomCommander
+
 
 class MiniBatchTrain:
     def __init__(self, nbattalion1, nbattalion2,
@@ -39,11 +42,23 @@ class MiniBatchTrain:
     def initialize_commanders(self, maxbattalion1, maxbattalion2):
         self.maxbattalion1 = maxbattalion1
         self.maxbattalion2 = maxbattalion2
-        self.commander1 = QCommander(self.regiment1, self.regiment2, self.maxbattalion1)
+        self.commander1 = doubleQCommander(self.regiment1, self.regiment2, self.maxbattalion1)
         self.commander2 = RandomCommander(self.regiment2, self.regiment1, self.maxbattalion2)
         self.commander1.set_order_action_map()
         self.commander2.set_order_action_map()
         self.commander1.set_model()
+
+    def visualize_Q(self, health1, action):
+        grid_length = 20
+        Q = np.zeros((grid_length,grid_length))
+        for i,health21 in enumerate(np.linspace(-1,10,grid_length)):
+            for j,health22 in enumerate(np.linspace(-1,10,grid_length)):
+                state = np.array([health1[0], health1[1], health21, health22])
+                state = torch.FloatTensor(state).to(self.commander1.device)
+                self.commander1.model.eval()
+                print(self.commander1.model.forward(state)[action])
+                Q[i][j] = self.commander1.model.forward(state)[action]
+        return Q
 
     def mini_batch_train(self, max_episodes, epsilon_decay_rate,
                          epsilon_init, batch_size):
@@ -72,7 +87,7 @@ class MiniBatchTrain:
 
             # choose random action for the first 20% episodes. Afterwards, choose epilson greedy with epsilon converges
             # to zero.
-            if episode >= 0.4*(max_episodes):
+            if episode >= 0.1*(max_episodes):
                 epsilon = (1. - epsilon_decay_rate) * epsilon
             while not done:
                 order1, action1 = self.commander1.order(state, eps=epsilon)
@@ -102,9 +117,13 @@ class MiniBatchTrain:
 
         return episode_rewards, losses, actions
 
+    def save_model(self, path='DQN_battle.tar'):
+        torch.save(self.commander1.model.state_dict(), path)
+
+
+
 
 if __name__ == '__main__':
-    from Commander import QCommander, RandomCommander
     import matplotlib.pyplot as plt
 
     def moving_average(x, n=20):
@@ -126,7 +145,7 @@ if __name__ == '__main__':
     DQ_train.deploy_regiments()
     DQ_train.initialize_commanders(maxbattalion1,maxbattalion2)
 
-    n_epoch = 5000
+    n_epoch = 1000
     epsilon_decay_rate = 0.01
     epsilon_init = 1
     batch_size = 64
@@ -134,6 +153,7 @@ if __name__ == '__main__':
     episode_rewards, losses, actions = DQ_train.mini_batch_train(
         n_epoch, epsilon_decay_rate, epsilon_init, batch_size)
 
+    DQ_train.save_model()
 
     fig = plt.figure()
     plt.plot(moving_average(episode_rewards))
