@@ -61,6 +61,7 @@ class MiniBatchTrain:
         return Q
 
     def mini_batch_train(self, max_episodes, epsilon_decay_rate,
+                         fraction_start_epsilon_greedy,
                          epsilon_init, batch_size):
         '''
         commander1: QCommander
@@ -87,7 +88,7 @@ class MiniBatchTrain:
 
             # choose random action for the first 20% episodes. Afterwards, choose epilson greedy with epsilon converges
             # to zero.
-            if episode >= 0.1*(max_episodes):
+            if episode >= fraction_start_epsilon_greedy*(max_episodes):
                 epsilon = (1. - epsilon_decay_rate) * epsilon
             while not done:
                 order1, action1 = self.commander1.order(state, eps=epsilon)
@@ -111,9 +112,9 @@ class MiniBatchTrain:
 
                 state = next_state
 
-            episode_rewards.append(episode_reward)
+            episode_rewards.append(np.sign(episode_reward))
             losses.append(loss)
-            print("Episode " + str(episode) + ": " + str(episode_reward), ' loss: ',loss, ' epsilon: ',epsilon)
+            print("Episode " + str(episode) + ": " + str(np.sign(episode_reward)), ' loss: ',loss, ' epsilon: ',epsilon)
 
         return episode_rewards, losses, actions
 
@@ -145,13 +146,16 @@ if __name__ == '__main__':
     DQ_train.deploy_regiments()
     DQ_train.initialize_commanders(maxbattalion1,maxbattalion2)
 
-    n_epoch = 1000
+    n_epoch = 20000
+    fraction_start_epsilon_greedy = 0.4
     epsilon_decay_rate = 0.01
     epsilon_init = 1
-    batch_size = 64
+    batch_size = 16
 
     episode_rewards, losses, actions = DQ_train.mini_batch_train(
-        n_epoch, epsilon_decay_rate, epsilon_init, batch_size)
+        n_epoch, epsilon_decay_rate,
+        fraction_start_epsilon_greedy,
+        epsilon_init, batch_size)
 
     DQ_train.save_model()
 

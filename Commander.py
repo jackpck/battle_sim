@@ -80,6 +80,9 @@ class RandomCommander(Commander):
         super().__init__(thisRegiment, enemyRegiment, nbatcommand)
 
     def order(self, state):
+        '''
+        Better than totally random. Will never attack enemy dead battalion nor order dead battalion to attack.
+        '''
         # number of valid (surviving) battalions
         n_valid_battalion1 = min(self.nbatcommand, len(self.thisRegiment.battalion_set))
         n_valid_battalion2 = min(self.nbatcommand, len(self.enemyRegiment.battalion_set))
@@ -119,14 +122,9 @@ class QCommander(Commander):
         when agent choose according to the q-table (early stage)
         '''
         if np.random.uniform(0,1) < eps:
-            n_valid_battalion1 = min(self.nbatcommand, len(self.thisRegiment.battalion_set))
-            offensive_team = [None] * self.nbatcommand
-            # Can only choose battalions that still survive.
-            offensive_team[:n_valid_battalion1] = random.sample(self.thisRegiment.battalion_set, n_valid_battalion1)
-            # In theory can attack non-existing battalions. Commander should be able to learn to avoid those order.
-            defensive_team = random.sample(list(range(self.enemyRegiment_size)), self.nbatcommand)
-            thisorder = offensive_team + defensive_team
-            return thisorder, self.order_to_action(thisorder)
+            # Make sure all actions are chosen. Otherwise, some are not going to get visited and updated.
+            thisaction = random.sample(self.action_order_map.keys(), self.nbatcommand)[0]
+            return self.action_order_map[thisaction], thisaction
 
         state = torch.FloatTensor(state).float().unsqueeze(0).to(self.device)
         #self.model.eval() # need this when forward passing one sample into nn with batchnorm layer
@@ -170,7 +168,7 @@ class QCommander(Commander):
 
 class doubleQCommander(QCommander):
     def __init__(self, thisRegiment, enemyRegiment, nbatcommand,
-                 gamma=0.95,
+                 gamma=0.7,
                  buffer_size=256,
                  replace_target_cnt=10):
         super().__init__(thisRegiment, enemyRegiment, nbatcommand,

@@ -28,6 +28,12 @@ class Regiment:
             if self.battalions[bat_id].get_health() <= 0:
                 self.battalion_set.remove(bat_id)
 
+    def __del__(self):
+        del self.battalion_set
+        del self.offense_set
+        del self.battalions
+
+
 
 class Battalion:
     __slot__ = '__attack', '__health', '__target'
