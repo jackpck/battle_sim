@@ -15,7 +15,7 @@ from Deploy import UniformDeploy, UniformIntDeploy
 from Commander import doubleQCommander, RandomCommander
 
 
-class MiniBatchTrain:
+class DQN_Battle:
     def __init__(self, nbattalion1, nbattalion2,
                  init_deploy1, init_deploy2):
         self.regiment1 = None
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     maxbattalion1 = 1
     maxbattalion2 = 1
 
-    DQ_train = MiniBatchTrain(nbattalion1,nbattalion2,
+    DQ_train = DQN_Battle(nbattalion1,nbattalion2,
                               init_deploy1, init_deploy2)
     DQ_train.deploy_regiments()
     DQ_train.initialize_commanders(maxbattalion1,maxbattalion2)
