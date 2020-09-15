@@ -12,13 +12,13 @@ his enemy. The enemy, upon receiving the damage, will have his defense value red
 the attacker's attack value. If the defense of a soldier becomes equal to or less than zero,
 that soldier is removed from the battlefield and will no longer participate in future rounds.
 A team is declared winner when there is at least one surviving soldier while the other team
-has none.
+has none. The rule of engagement is defined in `ROE.py`.
 
 ## Simulation result
 Interestingly, quality does not always trump quantity (and vice versa). When the defense of
 each soldier is small, the smaller team (more attack and defense per capita) is more likely to win while
 when the defense of each soldier is large, the larger team (less attack and defense per capita) is more
-likely to win.
+likely to win. The simulation is run in `main_simulation.py`.
 
 ## Reinforcement learning
 Can we teach a machine to micromanage the units and do better than just randomly choosing enemy to attack?
@@ -29,4 +29,4 @@ A neural network is used to learn the Q-value of each actions given the state of
 The number of possible actions is huge if all soldier are free to choose their targets. Therefore I will first
 limit the deep Q neural network (DQN) to learn the strategy of a battle that involves only 5 soldiers on each side
 and only one soldier per round is chosen to attack its target. Again, whichever side first loses all its soldiers 
-loses the battle. 
+loses the battle. The DQN is trained in `main_train_dqn.py`.
