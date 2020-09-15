@@ -28,14 +28,17 @@ class Battlefield:
             self.state[i + self.__regiment1.get_full_size()] = self.__regiment2.battalions[i].get_health()
 
     def commence_round(self):
+        self.__regiment1.offense_set = self.__regiment1.battalion_set
+        self.__regiment2.offense_set = self.__regiment2.battalion_set
         self.__regiment1.fire(self.__regiment2)
         self.__regiment2.fire(self.__regiment1)
-
         self.__regiment1.count_KIA()
         self.__regiment2.count_KIA()
 
-    def commence(self):
+    def commence(self, ROE1, ROE2):
         while self.__regiment1.battalion_set and self.__regiment2.battalion_set:
+            ROE1.aim(self.__regiment1, self.__regiment2)
+            ROE2.aim(self.__regiment2, self.__regiment1)
             self.commence_round()
 
     def get_reward(self):

@@ -14,18 +14,9 @@ that soldier is removed from the battlefield and will no longer participate in f
 A team is declared winner when there is at least one surviving soldier while the other team
 has none.
 
-### With reservists
-Instead of having all available soldiers attack, save half of the soldiers behind the 
-frontline as reservists. A reservist cannot attack unless the a frontline soldier is KIA.
-
 ## Simulation result
-Interestingly, quality does not always trump quantity (and vice versa). When the team size
-is small, the larger team (less attack and defense per capita) is more likely to win while
-when the team size is large, the smaller team (more attack and defense per capita) is more
+Interestingly, quality does not always trump quantity (and vice versa). When the defense of
+each soldier is small, the smaller team (more attack and defense per capita) is more likely to win while
+when the defense of each soldier is large, the larger team (less attack and defense per capita) is more
 likely to win.
 
-The implication can be very interesting. Say both teams are large. If they battle out, we know
-the smaller-but-better team will win. However, if each team is to be divided into subgroups
-e.g. one army into ten regiments, and each subgroup can only engage with a fixed 
-subgroup of the other team. Then as long as the size of the subgroup is small enough, the 
-larger team will win!

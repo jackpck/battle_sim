@@ -10,7 +10,6 @@ class Regiment:
     def get_full_size(self):
         return len(self.battalions)
 
-
     def fire(self, enemyRegiment):
         for bat_id in self.offense_set:
             if bat_id is not None and bat_id in self.battalion_set:

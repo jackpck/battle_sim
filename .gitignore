@@ -4,3 +4,4 @@ __pycache__
 env
 data
 simple_main.py
+.ipynb_checkpoints

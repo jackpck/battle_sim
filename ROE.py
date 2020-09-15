@@ -17,10 +17,11 @@ class fully_connected_ROE(ROE):
     '''
 
     def aim(self, thisRegiment, enemyRegiment):
-        enemy_soldier_set = list(enemyRegiment.soldier_set)
-        for soldier_id in thisRegiment.soldier_set:
-            enemy_targeted = np.random.choice(enemy_soldier_set)
-            thisRegiment.regiment[soldier_id].set_target(enemy_targeted)
+        enemy_battalion_set = list(enemyRegiment.battalion_set)
+        for bat_id in thisRegiment.battalion_set:
+            enemy_targeted = np.random.choice(enemy_battalion_set)
+            thisRegiment.battalions[bat_id].set_target(enemy_targeted)
+
 
 class range_ROE(ROE):
     '''
