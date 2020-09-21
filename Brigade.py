@@ -1,6 +1,10 @@
 from math import floor, ceil
 
 class Regiment:
+    '''
+    contains list of battalions.
+    Regiment action: fire, count KIA
+    '''
     def __init__(self):
         self.battalion_set = set() # id of surviving soldier
         self.offense_set = set()
@@ -11,6 +15,10 @@ class Regiment:
         return len(self.battalions)
 
     def fire(self, enemyRegiment):
+        '''
+        Go through targets of battalion in the offense_set.
+        If target is not empty, deal 'attack' damage to the target's health
+        '''
         for bat_id in self.offense_set:
             if bat_id is not None and bat_id in self.battalion_set:
                 enemy_bat_id = self.battalions[bat_id].get_target()
@@ -20,7 +28,8 @@ class Regiment:
 
     def count_KIA(self):
         '''
-        If soldier's health <= 0, remove id from the soldier_list
+        count number of battalions killed in action
+        If soldier's health <= 0, remove id from the battalion_list
         '''
         temp_battalion_set = self.battalion_set.copy()
         for bat_id in temp_battalion_set:

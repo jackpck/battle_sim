@@ -63,6 +63,7 @@ class Commander:
 
     def deliver_order(self, thisorder):
         '''
+        send order to battalions target.
         thisorder: (order1, order2).
         '''
         self.thisRegiment.offense_set = set(thisorder[:self.nbatcommand])
@@ -71,6 +72,9 @@ class Commander:
                 self.thisRegiment.battalions[bat].set_target(thisorder[i+self.nbatcommand])
 
     def order_to_action(self, thisorder):
+        '''
+        thisorder: (order1, order2) --> action: int
+        '''
         order_tuple = tuple(i for i in thisorder)
         return self.order_action_map[order_tuple]
 
@@ -146,10 +150,6 @@ class QCommander(Commander):
         curr_Q = curr_Q.squeeze(1)
         next_Q = self.model.forward(next_states) # [batch_size, naction]
         max_next_Q = torch.max(next_Q, 1)[0] # [batch_size, 1]
-        print('rewards: ',rewards.squeeze(1))
-        print('max_next_Q: ',max_next_Q)
-        print('(1-dones): ',1-dones)
-        print('(1-dones)*max_next_Q: ',(1-dones)*max_next_Q)
         expected_Q = rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q
 
         loss = self.MSE_loss(curr_Q, expected_Q)
@@ -199,10 +199,6 @@ class doubleQCommander(QCommander):
         curr_Q = self.model.forward(states).gather(1, actions.unsqueeze(1)).squeeze(1)
         next_Q = self.target_model.forward(states)
         max_next_Q = torch.max(next_Q, 1)[0] # [batch_size, 1]
-        #print('rewards: ',rewards.squeeze(1))
-        #print('max_next_Q: ',max_next_Q)
-        #print('(1-dones): ',1-dones)
-        #print('(1-dones)*max_next_Q: ',(1-dones)*max_next_Q)
         expected_Q = rewards.squeeze(1) + self.gamma*(1-dones)*max_next_Q
 
         loss = self.MSE_loss(curr_Q, expected_Q)

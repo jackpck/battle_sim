@@ -37,6 +37,9 @@ class UniformDeploy(Deploy):
 
 
 class UniformIntDeploy(Deploy):
+    '''
+    attack, health are integers and follows a uniform distribution
+    '''
     def __init__(self, thisRegiment, nBattalion):
         super().__init__(thisRegiment, nBattalion)
 

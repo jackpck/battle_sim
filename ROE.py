@@ -14,6 +14,7 @@ class ROE:
 class fully_connected_ROE(ROE):
     '''
     fully connected ROE
+    battalion can target any enemy battalion.
     '''
 
     def aim(self, thisRegiment, enemyRegiment):
@@ -26,11 +27,13 @@ class fully_connected_ROE(ROE):
 class range_ROE(ROE):
     '''
     finite range ROE
+    battalion can only target enemy battalion within certain range
     '''
 
     def __init__(self, r):
         self.__range = r
 
     def aim(self, thisRegiment, enemyRegiment):
+        # TODO
         pass
 

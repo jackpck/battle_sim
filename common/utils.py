@@ -86,8 +86,8 @@ class DQN_Battle:
             episode_reward = 0
             done = False
 
-            # choose random action for the first 20% episodes. Afterwards, choose epilson greedy with epsilon converges
-            # to zero.
+            # choose random action for the first x fractions of episodes.
+            # Afterwards, choose epilson greedy with epsilon converges to zero.
             if episode >= fraction_start_epsilon_greedy*(max_episodes):
                 epsilon = (1. - epsilon_decay_rate) * epsilon
             while not done:
